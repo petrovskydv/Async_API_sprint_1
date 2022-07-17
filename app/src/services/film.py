@@ -1,5 +1,5 @@
-from functools import lru_cache
-from typing import Optional
+from functools import lru_cache, partial
+from typing import Optional, Union
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
@@ -16,6 +16,36 @@ class FilmService:
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
         self.redis = redis
         self.elastic = elastic
+
+    async def get_films(
+            self,
+            size: int = 50,
+            offset: Union[int, None] = None,
+            sort_direction: str = 'desc',
+            genre: Union[str, None] = None
+    ) -> Optional[list[Film]]:
+
+        sort_field = 'imdb_rating'
+        es_search = partial(
+            self.elastic.search,
+            index='movies',
+            size=size,
+            sort=[f'{sort_field}:{sort_direction}'],
+            from_=offset,
+        )
+        if genre:
+            search_genre = {'query': {'match': {'genre': {
+                "query": "Adventure",
+                "fuzziness": "auto",
+                "operator": "and"
+            }}}}
+            search_result = await es_search(body=search_genre)
+        else:
+            search_result = await es_search()
+
+        docs = search_result['hits'].get('hits')
+        if docs:
+            return [Film.parse_obj(doc['_source']) for doc in docs]
 
     async def get_by_id(self, film_id: str) -> Optional[Film]:
         film = await self._film_from_cache(film_id)
