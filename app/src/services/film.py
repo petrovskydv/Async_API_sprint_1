@@ -23,7 +23,7 @@ class FilmService:
             offset: Union[int, None] = None,
             sort_direction: str = 'desc',
             genre: Union[str, None] = None
-    ) -> Optional[list[Film]]:
+    ) -> Optional[tuple[list[Film], int]]:
 
         sort_field = 'imdb_rating'
         es_search = partial(
@@ -32,6 +32,7 @@ class FilmService:
             size=size,
             sort=[f'{sort_field}:{sort_direction}'],
             from_=offset,
+            rest_total_hits_as_int=True,
         )
         if genre:
             search_genre = {'query': {'match': {'genre': {
@@ -43,9 +44,11 @@ class FilmService:
         else:
             search_result = await es_search()
 
+        found = search_result['hits']['total']
         docs = search_result['hits'].get('hits')
         if docs:
-            return [Film.parse_obj(doc['_source']) for doc in docs]
+            return [Film.parse_obj(doc['_source']) for doc in docs], found
+        return [], found
 
     async def get_by_id(self, film_id: str) -> Optional[Film]:
         film = await self._film_from_cache(film_id)
