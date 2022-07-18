@@ -18,7 +18,7 @@ class Person(UUIDMixin):
     name: str
 
 
-class Genre(BaseModel):
+class Genre(UUIDMixin):
     name: str
 
 
