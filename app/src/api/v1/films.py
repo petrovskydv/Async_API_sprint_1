@@ -1,10 +1,11 @@
+import math
 from enum import Enum
 from http import HTTPStatus
 from typing import Union
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
-from src.models.film import Film
+from src.api.v1.schemas import Films, Film
 from src.services.film import FilmService, get_film_service
 
 router = APIRouter()
@@ -24,16 +25,17 @@ class SortDirection(Enum):
     desc = '-imdb_rating'
 
 
-@router.get('/', response_model=list[Film], response_model_exclude={'actors', 'writers', 'genre', 'director'}, )
+@router.get('/', response_model=Films, response_model_exclude={'actors', 'writers', 'genre', 'director'}, )
 async def get_films(
         film_service: FilmService = Depends(get_film_service),
         per_page: int = 50,
-        page: int = 0,
+        page: int = Query(default=1, description='Номер страницы', ge=1),
         sort: SortDirection = SortDirection.desc,
-        genre: Union[str, None] = None
+        genre: Union[str, None] = None,
 ):
-    offset = page * per_page
-    films = await film_service.get_films(per_page, offset, sort.name, genre)
+    offset = (page - 1) * per_page
+    films, found = await film_service.get_films(per_page, offset, sort.name, genre)
+    total_pages = math.ceil(found / per_page)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
-    return films
+    return Films(found=found, page=page, pages=total_pages, per_page=per_page, data=films)
