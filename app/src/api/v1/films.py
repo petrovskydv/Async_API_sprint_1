@@ -46,3 +46,23 @@ async def get_films(
         meta=Pagination(found=found, page=page, pages=total_pages, per_page=per_page),
         data=films
     )
+
+
+@router.get('/search', response_model=FilmsSchema, description='Поиск фильмов')
+async def search_films(
+        film_service: FilmService = Depends(get_film_service),
+        per_page: int = Query(
+            default=50, alias='page[size]', description='Количество элементов на странице', ge=1, le=500
+        ),
+        page: int = Query(default=1, alias='page[number]', description='Номер страницы', ge=1),
+        query: Union[str, None] = Query(default=None, example='captain'),
+) -> FilmsSchema:
+    offset = (page - 1) * per_page
+    films, found = [], 0
+    total_pages = math.ceil(found / per_page)
+    if not films:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
+    return FilmsSchema(
+        meta=Pagination(found=found, page=page, pages=total_pages, per_page=per_page),
+        data=films
+    )

@@ -21,8 +21,19 @@ class Pagination(BaseModel):
     page: int
 
 
+class PersonRole(BaseModel):
+    role: str
+    film_ids: list[UUIDBaseClass]
+
+
 class PersonSchema(UUIDBaseClass):
     name: str
+    roles: list[PersonRole]
+
+
+class PersonsSchema(UUIDBaseClass):
+    meta: Pagination
+    data: list[PersonSchema]
 
 
 class GenreSchema(UUIDBaseClass):
