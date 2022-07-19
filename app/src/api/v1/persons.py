@@ -14,13 +14,13 @@ async def genre_details(person_id: str, person_service: PersonService = Depends(
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genre not found')
 
-    return person
+    return PersonSchema(**person.dict())
 
 
 @router.get('/', response_model=list[PersonSchema], description='Список персон')
 async def get_persons(
         person_service: PersonService = Depends(get_person_service),
-):
+) -> list[PersonSchema]:
     persons = []
     if not persons:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genres not found')

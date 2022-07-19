@@ -14,13 +14,13 @@ async def genre_details(genre_id: str, genre_service: GenreService = Depends(get
     if not genre:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genre not found')
 
-    return genre
+    return GenreSchema(**genre.dict())
 
 
 @router.get('/', response_model=list[GenreSchema], description='Список жанров')
 async def get_genres(
         film_service: GenreService = Depends(get_genre_service),
-):
+) -> list[GenreSchema]:
     genres = []
     if not genres:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genres not found')

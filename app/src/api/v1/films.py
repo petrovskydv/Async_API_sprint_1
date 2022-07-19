@@ -17,7 +17,7 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
 
-    return film
+    return FilmSchema(**film.dict())
 
 
 class SortDirection(Enum):
@@ -36,7 +36,7 @@ async def get_films(
         genre: Union[str, None] = Query(
             default=None, alias='filter[genre]', description='Поиск по жанру', example='comedy'
         ),
-):
+) -> FilmsSchema:
     offset = (page - 1) * per_page
     films, found = await film_service.get_films(per_page, offset, sort.name, genre)
     total_pages = math.ceil(found / per_page)
