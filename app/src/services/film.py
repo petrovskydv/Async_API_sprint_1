@@ -10,9 +10,6 @@ from src.db.redis import get_redis
 from src.models.models import Film
 from src.services.base_service import BaseSearcher, get_base_searcher
 
-# TODO вынести в настройки
-FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
-
 
 class FilmService:
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch, searcher: BaseSearcher, index_name: str):

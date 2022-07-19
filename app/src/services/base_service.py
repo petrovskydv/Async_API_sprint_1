@@ -6,10 +6,9 @@ from elasticsearch import AsyncElasticsearch, NotFoundError
 from fastapi import Depends
 from pydantic import BaseModel
 
+from src.core.config import CACHE_EXPIRE_IN_SECONDS
 from src.db.elastic import get_elastic
 from src.db.redis import get_redis
-
-CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
 
 
 class BaseSearcher:
