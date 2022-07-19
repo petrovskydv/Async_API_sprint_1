@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from src.models.film import orjson_dumps
 
 
-class UUIDMixin(BaseModel):
+class UUIDBaseClass(BaseModel):
     id: str
 
     class Config:
@@ -14,15 +14,22 @@ class UUIDMixin(BaseModel):
         json_dumps = orjson_dumps
 
 
-class Person(UUIDMixin):
+class Pagination(BaseModel):
+    found: int
+    pages: int
+    per_page: int
+    page: int
+
+
+class Person(UUIDBaseClass):
     name: str
 
 
-class Genre(UUIDMixin):
+class Genre(UUIDBaseClass):
     name: str
 
 
-class FilmBase(UUIDMixin):
+class FilmBase(UUIDBaseClass):
     title: str
     description: str
     imdb_rating: float
@@ -36,8 +43,5 @@ class Film(FilmBase):
 
 
 class Films(BaseModel):
-    found: int
-    pages: int
-    per_page: int
-    page:int
+    meta: Pagination
     data: list[FilmBase]

@@ -8,7 +8,7 @@ def orjson_dumps(v, *, default):
     return orjson.dumps(v, default=default).decode()
 
 
-class UUIDMixin(BaseModel):
+class UUIDBaseClass(BaseModel):
     id: str
 
     class Config:
@@ -16,15 +16,15 @@ class UUIDMixin(BaseModel):
         json_dumps = orjson_dumps
 
 
-class Person(UUIDMixin):
+class Person(UUIDBaseClass):
     name: str
 
 
-class Genre(UUIDMixin):
+class Genre(UUIDBaseClass):
     name: str
 
 
-class Film(UUIDMixin):
+class Film(UUIDBaseClass):
     title: str
     description: str
     imdb_rating: float

@@ -5,7 +5,7 @@ from typing import Union
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from src.api.v1.schemas import Films, Film
+from src.api.v1.schemas import Films, Film, Pagination
 from src.services.film import FilmService, get_film_service
 
 router = APIRouter()
@@ -42,4 +42,7 @@ async def get_films(
     total_pages = math.ceil(found / per_page)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
-    return Films(found=found, page=page, pages=total_pages, per_page=per_page, data=films)
+    return Films(
+        meta=Pagination(found=found, page=page, pages=total_pages, per_page=per_page),
+        data=films
+    )
