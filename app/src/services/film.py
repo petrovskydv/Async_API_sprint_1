@@ -7,7 +7,7 @@ from fastapi import Depends
 
 from src.db.elastic import get_elastic
 from src.db.redis import get_redis
-from src.models.film import Film
+from src.models.models import Film
 from src.services.base_service import BaseSearcher, get_base_searcher
 
 # TODO вынести в настройки

@@ -3,7 +3,7 @@ from typing import Optional
 import orjson
 from pydantic import BaseModel
 
-from src.models.film import orjson_dumps
+from src.models.models import orjson_dumps
 
 
 class UUIDBaseClass(BaseModel):

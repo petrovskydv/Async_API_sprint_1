@@ -7,7 +7,7 @@ from fastapi import Depends
 
 from src.db.elastic import get_elastic
 from src.db.redis import get_redis
-from src.models.film import Genre
+from src.models.models import Genre
 from src.services.base_service import BaseSearcher, get_base_searcher
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
