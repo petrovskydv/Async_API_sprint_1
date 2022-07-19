@@ -11,7 +11,7 @@ from src.services.film import FilmService, get_film_service
 router = APIRouter()
 
 
-@router.get('/{film_id}', response_model=Film)
+@router.get('/{film_id}', response_model=Film, description='Информация о фильме')
 async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> Film:
     film = await film_service.get_by_id(film_id)
     if not film:
@@ -25,13 +25,17 @@ class SortDirection(Enum):
     desc = '-imdb_rating'
 
 
-@router.get('/', response_model=Films, response_model_exclude={'actors', 'writers', 'genre', 'director'}, )
+@router.get('/', response_model=Films, description='Список фильмов')
 async def get_films(
         film_service: FilmService = Depends(get_film_service),
-        per_page: int = 50,
-        page: int = Query(default=1, description='Номер страницы', ge=1),
-        sort: SortDirection = SortDirection.desc,
-        genre: Union[str, None] = None,
+        per_page: int = Query(
+            default=50, alias='page[size]', description='Количество элементов на странице', ge=1, le=500
+        ),
+        page: int = Query(default=1, alias='page[number]', description='Номер страницы', ge=1),
+        sort: SortDirection = Query(default=SortDirection.desc, description='Сортировка по рейтингу'),
+        genre: Union[str, None] = Query(
+            default=None, alias='filter[genre]', description='Поиск по жанру', example='comedy'
+        ),
 ):
     offset = (page - 1) * per_page
     films, found = await film_service.get_films(per_page, offset, sort.name, genre)
