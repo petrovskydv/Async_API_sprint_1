@@ -21,27 +21,27 @@ class Pagination(BaseModel):
     page: int
 
 
-class Person(UUIDBaseClass):
+class PersonSchema(UUIDBaseClass):
     name: str
 
 
-class Genre(UUIDBaseClass):
+class GenreSchema(UUIDBaseClass):
     name: str
 
 
-class FilmBase(UUIDBaseClass):
+class BaseFilmSchema(UUIDBaseClass):
     title: str
     description: str
     imdb_rating: float
 
 
-class Film(FilmBase):
+class FilmSchema(BaseFilmSchema):
     genre: list[str]
-    actors: Optional[list[Person]]
-    writers: Optional[list[Person]]
+    actors: Optional[list[PersonSchema]]
+    writers: Optional[list[PersonSchema]]
     director: Optional[list[str]]
 
 
-class Films(BaseModel):
+class FilmsSchema(BaseModel):
     meta: Pagination
-    data: list[FilmBase]
+    data: list[BaseFilmSchema]
