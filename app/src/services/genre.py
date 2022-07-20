@@ -22,6 +22,17 @@ class GenreService:
         genre = await self.searcher.get_by_id(genre_id, self.index_name, Genre)
         return genre
 
+    async def get_genres(self) -> Optional[tuple[list[Genre], int]]:
+        search_result = await self.elastic.search(
+            index='genres',
+            rest_total_hits_as_int=True,
+        )
+        found = search_result['hits']['total']
+        docs = search_result['hits'].get('hits')
+        if docs:
+            return [Genre.parse_obj(doc['_source']) for doc in docs], found
+        return [], found
+
 
 @lru_cache()
 def get_genre_service(
