@@ -40,6 +40,11 @@ class GenreSchema(UUIDBaseClass):
     name: str
 
 
+class GenresSchema(BaseModel):
+    meta: Pagination
+    data: list[GenreSchema]
+
+
 class BaseFilmSchema(UUIDBaseClass):
     title: str
     description: str

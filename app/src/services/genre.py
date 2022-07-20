@@ -24,7 +24,8 @@ class GenreService:
 
     async def get_genres(self) -> Optional[tuple[list[Genre], int]]:
         search_result = await self.elastic.search(
-            index='genres',
+            index=self.index_name,
+            sort=['id:asc'],
             rest_total_hits_as_int=True,
         )
         found = search_result['hits']['total']

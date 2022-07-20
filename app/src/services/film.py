@@ -29,7 +29,7 @@ class FilmService:
         sort_field = 'imdb_rating'
         es_search = partial(
             self.elastic.search,
-            index='movies',
+            index=self.index_name,
             size=size,
             sort=[f'{sort_field}:{sort_direction}'],
             from_=offset,

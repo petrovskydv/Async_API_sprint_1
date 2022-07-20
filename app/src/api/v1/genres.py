@@ -2,7 +2,8 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from src.api.v1.schemas import GenreSchema
+from src.api.v1.paginator import Paginator
+from src.api.v1.schemas import GenreSchema, GenresSchema, Pagination
 from src.services.genre import GenreService, get_genre_service
 
 router = APIRouter()
@@ -17,11 +18,16 @@ async def genre_details(genre_id: str, genre_service: GenreService = Depends(get
     return GenreSchema(**genre.dict())
 
 
-@router.get('/', response_model=list[GenreSchema], description='Список жанров')
+@router.get('/', response_model=GenresSchema, description='Список жанров')
 async def get_genres(
         genre_service: GenreService = Depends(get_genre_service),
-) -> list[GenreSchema]:
+        paginator: Paginator = Depends(),
+) -> GenresSchema:
     genres, found = await genre_service.get_genres()
+    total_pages = paginator.get_total_pages(found)
     if not genres:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genres not found')
-    return genres
+    return GenresSchema(
+        meta=Pagination(found=found, page=paginator.page, pages=total_pages, per_page=paginator.per_page),
+        data=genres
+    )
