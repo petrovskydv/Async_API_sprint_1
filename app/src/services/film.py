@@ -36,12 +36,53 @@ class FilmService:
             rest_total_hits_as_int=True,
         )
         if genre:
-            search_genre = {'query': {'match': {'genre': {
-                "query": "Adventure",
-                "fuzziness": "auto",
-                "operator": "and"
-            }}}}
+            search_genre = {
+                'query': {
+                    'match': {
+                        'genre': {
+                            "query": genre,
+                            "fuzziness": "auto",
+                            "operator": "and"
+                        }
+                    }
+                }
+            }
             search_result = await es_search(body=search_genre)
+        else:
+            search_result = await es_search()
+
+        found = search_result['hits']['total']
+        docs = search_result['hits'].get('hits')
+        if docs:
+            return [Film.parse_obj(doc['_source']) for doc in docs], found
+        return [], found
+
+    async def search_films(
+            self,
+            size: int = 50,
+            offset: Union[int, None] = None,
+            query: Union[str, None] = None
+    ) -> Optional[tuple[list[Film], int]]:
+
+        es_search = partial(
+            self.elastic.search,
+            index=self.index_name,
+            size=size,
+            from_=offset,
+            rest_total_hits_as_int=True,
+        )
+        if query:
+            search_query = {
+                "query": {
+                    "bool": {
+                        "should": [
+                            {"match": {"title": query}},
+                            {"match": {"description": query}}
+                        ]
+                    }
+                }
+            }
+            search_result = await es_search(body=search_query)
         else:
             search_result = await es_search()
 
