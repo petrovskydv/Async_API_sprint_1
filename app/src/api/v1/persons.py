@@ -25,8 +25,7 @@ async def get_persons(
         paginator: Paginator = Depends(),
         query: Union[str, None] = Query(default=None, example='captain'),
 ) -> PersonsSchema:
-    persons = []
-    found = 0
+    persons, found = await person_service.search_person(paginator.per_page, paginator.get_offset, query)
     total_pages = paginator.get_total_pages(found)
     if not persons:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
